@@ -1,0 +1,4 @@
+faiss
+openai
+langchain
+pickle
