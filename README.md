@@ -1,1 +1,2 @@
-# albert-research-langchain
+# Albert Health Guidelines with LangChain + ChatGPT Integration
+

@@ -1,4 +1,4 @@
 ingest.py
 *.env
-Notion_DB/
+guidelines_data/Notion_DB/
 .streamlit/
