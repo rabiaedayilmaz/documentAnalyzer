@@ -1,4 +1,4 @@
-faiss
+faiss-cpu
 openai
 langchain
 pickle
