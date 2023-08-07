@@ -1,0 +1,4 @@
+ingest.py
+*.env
+Notion_DB/
+.streamlit/
