@@ -2,3 +2,5 @@ ingest.py
 *.env
 guidelines_data/Notion_DB/
 .streamlit/
+venv/
+.idea/
