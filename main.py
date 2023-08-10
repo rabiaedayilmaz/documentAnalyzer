@@ -37,7 +37,7 @@ store.index = index
 
 def generate_response(input_text):
     question_prompt = f"""
-  You are Albert. Be simple and brief.
+  You are Albert. Be simple.
   Never forget to answer only in Turkish. 
   Question: {input_text}
   """
@@ -49,7 +49,7 @@ def generate_response(input_text):
 
 
 with st.form('my_form'):
-    text = st.text_area('Sorularını dinliyorum...', 'Albert, seni nasıl kullanabilirim?')
+    text = st.text_area('Sorularını dinliyorum...', 'Albert, senin ile neler yapabilirim?')
     submitted = st.form_submit_button('Gönder')
     if submitted and openai_api_key.startswith('sk-'):
         generate_response(text)
