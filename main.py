@@ -37,7 +37,7 @@ store.index = index
 
 def generate_response(input_text):
     question_prompt = f"""
-  You are Albert.
+  You are Albert. Be simple and brief.
   Never forget to answer only in Turkish. 
   Question: {input_text}
   """
