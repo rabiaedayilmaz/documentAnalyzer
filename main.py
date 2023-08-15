@@ -3,6 +3,7 @@ import streamlit as st
 import faiss
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
+from langchain.memory import ConversationBufferMemory
 from langchain.callbacks.base import BaseCallbackHandler
 import pickle
 from langchain.prompts import PromptTemplate
@@ -25,6 +26,8 @@ openai_org_id = st.secrets["OPENAI_ORGANIZATION_KEY"]
 
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
+    st.session_state.i = 0
+    st.session_state.last_chat = {}
 
 @st.cache_data
 def load_data(path="guidelines_data/docs.index"):
@@ -59,9 +62,11 @@ i=0
 
 def get_chain(vectorstore, stream_handler):
     llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0.1, streaming=True, callbacks=[stream_handler])
+    memory = ConversationBufferMemory(memory_key='chat_history', return_messages=False, output_key='answer')
     qa_chain = ConversationalRetrievalChain.from_llm(
-        llm,
-        vectorstore.as_retriever(),
+        llm=llm,
+        retriever=vectorstore.as_retriever(),
+        memory=memory,
         condense_question_prompt=CONDENSE_QUESTION_PROMPT,
         return_source_documents=True,
     )
@@ -71,7 +76,8 @@ def generate_response(input_text):
     chat_box = st.empty()
     stream_handler = StreamHandler(chat_box)
     qa_chain = get_chain(vectorstore, stream_handler)
-    result = qa_chain({"question": input_text, "chat_history": st.session_state.chat_history})
+    result = qa_chain({"question": input_text, "chat_history": st.session_state.last_chat})
+    st.session_state.i += 1
     return result
 
 with st.form('my_form'):
@@ -80,15 +86,14 @@ with st.form('my_form'):
     with col1:
         submitted = st.form_submit_button('Gönder \U0001F914')
     if submitted and openai_api_key.startswith('sk-'):
-        i += 1
         result = generate_response(text)
-        last_chat = {
+        st.session_state.last_chat = {
         "input_text": result["question"],
         "answer": result['answer'],
         "source_documents": result['source_documents'],
         }
-        st.session_state.chat_history.append(last_chat)
+        st.session_state.chat_history.append(st.session_state.last_chat)
     with col2:
         show_source = st.form_submit_button("\U0001F4C4 Kaynağı Göster")
     if show_source:
-        st.markdown(f"Kaynak İçerik:\n\n{st.session_state.chat_history[i]['source_documents'][0].page_content}")
+        st.markdown(f"Kaynak İçerik:\n\n{st.session_state.last_chat['source_documents'].page_content}")
