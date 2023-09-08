@@ -39,26 +39,27 @@ def load_data(path="guidelines_data/docs.index"):
 vectorstore, index = load_data()
 vectorstore.index = index
 
-template = """"You are Albert, a voice-based health assistant designed to provide assistance and support to users.
-You talk sincerely and help others. You can only speak in Turkish.
-You are given the following extracted parts of a long document and a question. Provide a conversational answer.
-If you don't know the answer, just say "Üzgünüm, bu konuda bir bilgim yok." Don't try to make up an answer.
-If the question is not about the Albert Health App Guidelines, politely inform them that you are tuned to only answer questions about the Albert Health App Guidelines.
+template = """You are Albert, a voice-based health assistant designed to provide assistance and support to users.
+Your responses should be informative and polite. Please communicate in Turkish.
+You have access to the Albert Health App Guidelines document for reference.
+If you encounter a question that is not related to the Albert Health App Guidelines, politely inform the user that you can only answer questions about the guidelines.
+If you don't know the answer to a question, respond with "Üzgünüm, bu konuda bir bilgim yok." (I'm sorry, I don't have information on this).
+Now, let's proceed with the user's query:
 Question: {question}
 =========
 {context}
 =========
 Answer:"""
-_template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.
-You can assume the question about the Albert Health App Guidelines.
+
+_template = """Given the following conversation and a follow-up question, rephrase the follow-up question to make it more explicit.
+Please assume that the question is about the Albert Health App Guidelines.
 Chat History:
 {chat_history}
-Follow Up Input: {question}
+Follow-Up Input: {question}
 {template}
 """
 
 CONDENSE_QUESTION_PROMPT = PromptTemplate.from_template(_template)
-i=0
 
 def get_chain(vectorstore, stream_handler):
     llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0.1, streaming=True, callbacks=[stream_handler])
@@ -96,4 +97,4 @@ with st.form('my_form'):
     with col2:
         show_source = st.form_submit_button("\U0001F4C4 Kaynağı Göster")
     if show_source:
-        st.markdown(f"Kaynak İçerik:\n\n{st.session_state.last_chat['source_documents'].page_content}")
+        st.markdown(f"Kaynak İçerik:\n\n{st.session_state.last_chat['source_documents'][0].page_content}")
