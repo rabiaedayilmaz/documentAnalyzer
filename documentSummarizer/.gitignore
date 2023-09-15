@@ -1,0 +1,6 @@
+*.env
+.streamlit/
+*.venv/
+*.vscode/
+tur.traineddata
+*__pycache__
